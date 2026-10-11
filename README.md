@@ -10,24 +10,17 @@ Glowly คือระบบควบคุมไฟในบ้านแบบ 
 
 ## สถาปัตยกรรมระบบ
 
-```
-┌──────────────┐   HTTP (login / devices)   ┌────────────────────┐
-│  เว็บเบราว์เซอร์ │ ─────────────────────────► │                    │
-│  / แอป Android │                            │   Node.js Server   │
-│  (Capacitor)  │ ◄─────── WebSocket ───────► │  (Express + ws)    │
-└──────────────┘        (real-time)          │                    │
-                                             └─────────┬──────────┘
-                                                       │ mysql2
-                                              ┌────────▼─────────┐
-                                              │      MySQL        │
-                                              │ users / devices   │
-                                              └───────────────────┘
-                                                       ▲
-                                       WebSocket       │
-                                              ┌────────┴─────────┐
-                                              │      ESP32        │
-                                              │  รับคำสั่งเปิด/ปิดไฟ  │
-                                              └──────────────────┘
+```mermaid
+flowchart TD
+    CLIENT["เว็บเบราว์เซอร์ / แอป Android (Capacitor)"]
+    SERVER["Node.js Server (Express + ws)"]
+    DB[("MySQL: users / devices")]
+    ESP32["ESP32 (รับคำสั่งเปิด/ปิดไฟ)"]
+
+    CLIENT -->|"HTTP: login / devices"| SERVER
+    SERVER -->|"WebSocket: real-time"| CLIENT
+    SERVER -->|mysql2| DB
+    ESP32 <-->|WebSocket| SERVER
 ```
 
 - **หน้าบ้าน (Login + Dashboard)** เรียก REST API เพื่อยืนยันตัวตนและดึงรายการอุปกรณ์
